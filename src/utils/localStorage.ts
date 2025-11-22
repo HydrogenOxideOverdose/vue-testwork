@@ -19,4 +19,4 @@ export const localStorageService = {
       console.error('Failed to save products to localStorage:', error);
     }
   }
-};
+}

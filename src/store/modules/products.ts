@@ -1,10 +1,13 @@
-import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
+import { Module, VuexModule, Mutation, Action, MutationAction } from 'vuex-module-decorators';
 import { Product, ProductCategory, ProductStatus, ProductFormData, Notification } from '@/types/product';
 import { ProductsState } from '@/store/types';
 import { mockApi } from '@/services/mockApi';
 import { localStorageService } from '@/utils/localStorage';
 
-@Module({ namespaced: true, name: 'products' })
+@Module({
+  namespaced: true,
+  name: 'products'
+})
 export default class ProductsModule extends VuexModule implements ProductsState {
   products: Product[] = [];
   isLoading = false;
@@ -16,60 +19,24 @@ export default class ProductsModule extends VuexModule implements ProductsState 
   }
 
   @Mutation
-  SET_PRODUCTS(products: Product[]): void {
-    this.products = products;
-  }
-
-  @Mutation
-  SET_LOADING(loading: boolean): void {
-    this.isLoading = loading;
-  }
-
-  @Mutation
-  SET_HAS_CHANGES(hasChanges: boolean): void {
-    this.hasChanges = hasChanges;
-  }
-
-  @Mutation
   SET_NOTIFICATION(notification: Notification | null): void {
     this.notification = notification;
   }
 
-  @Mutation
-  ADD_PRODUCT(product: Product): void {
-    this.products.push(product);
-    this.hasChanges = true;
-  }
-
-  @Mutation
-  REMOVE_PRODUCT(productId: number): void {
-    this.products = this.products.filter(p => p.id !== productId);
-    this.hasChanges = true;
-  }
-
-  @Mutation
-  MOVE_PRODUCT(payload: { fromIndex: number; toIndex: number }): void {
-    const { fromIndex, toIndex } = payload;
-    const product = this.products[fromIndex];
-    this.products.splice(fromIndex, 1);
-    this.products.splice(toIndex, 0, product);
-    this.hasChanges = true;
-  }
-
-  @Action
-  async loadProducts(): Promise<void> {
+  @MutationAction
+  async loadProducts() {
+    console.log('MutationAction: loadProducts');
     const savedProducts = localStorageService.getProducts();
-    this.SET_PRODUCTS(savedProducts);
+    console.log('Loaded from localStorage:', savedProducts);
+    return { products: savedProducts };
   }
 
-  @Action
-  async addProduct({ commit, dispatch }: any, formData: ProductFormData): Promise<void> {
-    console.log('Store addProduct получил:', formData);
-    
-    commit('SET_LOADING', true);
+  @MutationAction
+  async addProduct(formData: ProductFormData) {
+    console.log('MutationAction: addProduct получил:', formData);
     try {
+      this.context.commit('SET_LOADING', true);
       await mockApi.createProduct(formData);
-      
       const newProduct: Product = {
         id: Date.now(),
         name: formData.name,
@@ -78,67 +45,121 @@ export default class ProductsModule extends VuexModule implements ProductsState 
         quantity: formData.quantity || 0,
         status: (formData.quantity || 0) > 0 ? ProductStatus.IN_STOCK : ProductStatus.OUT_OF_STOCK
       };
-
       console.log('Новый продукт для добавления:', newProduct);
-      
-      commit('ADD_PRODUCT', newProduct);
-      dispatch('showNotification', { message: 'Товар успешно добавлен', type: 'success' });
+      const updatedProducts = [...this.products, newProduct];
+      showNotificationHelper(this, 'Товар успешно добавлен', 'success' );
+      return { 
+        products: updatedProducts,
+        hasChanges: true
+      };
     } catch (error) {
       console.error('Ошибка при добавлении товара:', error);
-      dispatch('showNotification', { message: 'Ошибка при добавлении товара', type: 'error' });
+      showNotificationHelper(this, 'Ошибка при добавлении товара', 'error');
+      return { 
+        products: this.products 
+      };
     } finally {
-      commit('SET_LOADING', false);
+      this.context.commit('SET_LOADING', false);
     }
   }
 
-  @Action
-  async deleteProduct(productId: number): Promise<void> {
-    this.SET_LOADING(true);
+  @MutationAction
+  async deleteProduct(productId: number) {
+    console.log('MutationAction: deleteProduct', productId);
     try {
+      this.context.commit('SET_LOADING', true);
       await mockApi.deleteProduct(productId);
-      this.REMOVE_PRODUCT(productId);
-      this.showNotification('Товар успешно удален', 'success');
+      const updatedProducts = this.products.filter(p => p.id !== productId);
+      showNotificationHelper(this, 'Товар успешно удален', 'success' );
+
+      return { 
+        products: updatedProducts,
+        hasChanges: true
+      };
     } catch (error) {
-      this.showNotification('Ошибка при удалении товара', 'error');
+      console.error('Ошибка при удалении товара:', error);
+      showNotificationHelper(this, 'Ошибка при удалении товара', 'error' );
+      return { 
+        products: this.products 
+      };
     } finally {
-      this.SET_LOADING(false);
+      this.context.commit('SET_LOADING', false);
     }
   }
 
-  @Action
-  moveProductUp(productId: number): void {
+  @MutationAction
+  async moveProductUp(productId: number) {
+    console.log('MutationAction: moveProductUp', productId);
     const index = this.products.findIndex(p => p.id === productId);
     if (index > 0) {
-      this.MOVE_PRODUCT({ fromIndex: index, toIndex: index - 1 });
+      const products = [...this.products];
+      const product = products[index];
+      products.splice(index, 1);
+      products.splice(index - 1, 0, product);
+      
+      return { 
+        products,
+        hasChanges: true
+      };
     }
+    return { 
+      products: this.products 
+    };
   }
 
-  @Action
-  moveProductDown(productId: number): void {
+  @MutationAction
+  async moveProductDown(productId: number) {
+    console.log('MutationAction: moveProductDown', productId);
     const index = this.products.findIndex(p => p.id === productId);
     if (index < this.products.length - 1) {
-      this.MOVE_PRODUCT({ fromIndex: index, toIndex: index + 1 });
+      const products = [...this.products];
+      const product = products[index];
+      products.splice(index, 1);
+      products.splice(index + 1, 0, product);
+      
+      return { 
+        products,
+        hasChanges: true
+      };
     }
-  }
-
-  @Action
-  saveToLocalStorage(): void {
-    localStorageService.saveProducts(this.products);
-    this.SET_HAS_CHANGES(false);
-    this.showNotification('Данные успешно сохранены', 'success');
-  }
-
-  @Action
-  showNotification(message: string, type: 'success' | 'error'): void {
-    const notification: Notification = {
-      type,
-      message,
-      id: Date.now()
+    return { 
+      products: this.products 
     };
-    this.SET_NOTIFICATION(notification);
-    
-    setTimeout(() => {
-      this.SET_NOTIFICATION(null);
-    }, 3000);
   }
+
+  @MutationAction
+  async saveToLocalStorage() {
+    console.log('MutationAction: saveToLocalStorage');
+    
+    localStorageService.saveProducts(this.products);
+    
+    showNotificationHelper(this, 'Данные успешно сохранены', 'success');
+
+    return { 
+      hasChanges: false 
+    };
+  }
+
 }
+
+
+interface NotificationContext {
+  context: {
+    commit: (mutation: string, payload?: any) => void;
+  };
+}
+
+const showNotificationHelper = (ctx: NotificationContext, message: string, type: 'success' | 'error'): void => {
+  const notification: Notification = {
+    type,
+    message,
+    id: Date.now()
+  };
+  
+  console.log("message", message, type);
+  ctx.context.commit('SET_NOTIFICATION', notification);
+  
+  setTimeout(() => {
+    ctx.context.commit('SET_NOTIFICATION', null);
+  }, 3000);
+};

@@ -19,4 +19,4 @@ export const mockApi = {
     await randomDelay();
     return { success: true };
   }
-};
+}
