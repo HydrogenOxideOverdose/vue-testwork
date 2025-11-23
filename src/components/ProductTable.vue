@@ -19,7 +19,7 @@
         <td>${{ product.price }}</td>
         <td>{{ product.quantity }}</td>
         <td>
-          <span :class="['status', product.status === 'В наличии' ? 'in-stock' : 'out-of-stock']">
+          <span :class="['status', product.status === 'В наличии' ? 'in_stock' : 'out_of_stock']">
             {{ product.status }}
           </span>
         </td>
@@ -79,67 +79,3 @@ export default class ProductTable extends Vue {
   }
 }
 </script>
-
-<style scoped>
-.product-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.product-table th,
-.product-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-.product-table th {
-  background-color: #f8f9fa;
-  font-weight: bold;
-}
-
-.status.in-stock {
-  color: #4CAF50;
-  font-weight: bold;
-}
-
-.status.out-of-stock {
-  color: #f44336;
-  font-weight: bold;
-}
-
-.actions {
-  display: flex;
-  gap: 5px;
-}
-
-.btn-move {
-  background: #ff9800;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.btn-move:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.btn-delete {
-  background: #f44336;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.btn-delete:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-</style>

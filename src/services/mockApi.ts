@@ -10,6 +10,9 @@ export const mockApi = {
 
     await randomDelay();
     return { success: true };
+
+  
+
   },
 
   async deleteProduct(productId: number): Promise<{ success: boolean }> {

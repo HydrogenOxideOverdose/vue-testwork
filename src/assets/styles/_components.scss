@@ -1,0 +1,297 @@
+@import 'variables';
+
+// Product Manager
+.product-manager {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: $spacing-md;
+
+
+  h1 {
+    color: $text-color;
+    margin-bottom: $spacing-xl;
+    text-align: center;
+    font-size: $font-size-xxl;
+    font-weight: 700;
+  }
+}
+
+// Manager Container
+.manager-container {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+  border: 2px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-md;
+  background: $white;
+  box-shadow: $shadow-sm;
+}
+
+// Sections
+.form-section,
+.table-section {
+  background: $white;
+
+  h2 {
+    color: $text-color;
+    margin-bottom: $spacing-lg;
+    font-size: $font-size-xl;
+    border-bottom: 2px solid $primary-color;
+    padding-bottom: $spacing-sm;
+  }
+}
+
+// Table Header
+.table-header {
+  margin-bottom: $spacing-lg;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+
+  h2 {
+    margin: 0;
+    color: $text-color;
+    font-size: $font-size-xl;
+  }
+
+  .actions {
+    display: flex;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+  }
+}
+
+// Buttons
+.btn {
+  &-save {
+    min-width: 180px;
+  }
+
+  &-test {
+    min-width: 120px;
+  }
+
+}
+
+// Notifications
+.notification {
+  position: fixed;
+  top: $spacing-lg;
+  right: $spacing-lg;
+  padding: $spacing-md $spacing-lg;
+  border-radius: $border-radius-md;
+  color: $white;
+  font-weight: 600;
+  min-width: 300px;
+  box-shadow: $shadow-lg;
+
+
+  &.success {
+    background: linear-gradient(135deg, $success-color, darken($success-color, 10%));
+    border-left: 4px solid darken($success-color, 15%);
+  }
+
+  &.error {
+    background: linear-gradient(135deg, $error-color, darken($error-color, 10%));
+    border-left: 4px solid darken($error-color, 15%);
+  }
+
+  &.warning {
+    background: linear-gradient(135deg, $warning-color, darken($warning-color, 10%));
+    border-left: 4px solid darken($warning-color, 15%);
+  }
+}
+
+
+.big-btn {
+  display: block;
+  margin: $spacing-xl auto;
+  text-align: center;
+  min-width: 200px;
+  background: linear-gradient(135deg, $primary-color, darken($primary-color, 8%));
+  color: $white;
+  font-weight: 600;
+  padding: $spacing-md $spacing-xl;
+  border-radius: $border-radius-lg;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 10px rgba($success-color, 0.3);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba($white, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 4px 15px rgba($success-color, 0.4),
+      0 0 0 1px rgba($success-color, 0.1);
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 5px rgba($success-color, 0.3);
+  }
+  
+  &:disabled {
+    background: linear-gradient(135deg, $text-light, darken($text-light, 8%));
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+
+// Empty States
+.no-products {
+  text-align: center;
+  padding: $spacing-xxl;
+  color: $text-light;
+
+  p {
+    margin-bottom: $spacing-md;
+    font-size: $font-size-lg;
+  }
+
+  .btn-sample {
+    margin-top: $spacing-md;
+  }
+}
+
+
+// Form Elements (для ProductForm)
+.form-group {
+  margin-bottom: $spacing-lg;
+
+  label {
+    display: block;
+    margin-bottom: $spacing-sm;
+    font-weight: 600;
+    color: $text-color;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    border: 2px solid $border-color;
+    border-radius: $border-radius-md;
+    font-size: $font-size-md;
+    transition: border-color 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    }
+
+    &:disabled {
+      background-color: $bg-color;
+      cursor: not-allowed;
+    }
+  }
+
+  .error-message {
+    color: $error-color;
+    font-size: $font-size-sm;
+    margin-top: $spacing-xs;
+  }
+}
+
+// Table Styles (для ProductTable)
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: $white;
+  box-shadow: $shadow-sm;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+
+
+  .status {
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &.in_stock {
+      background: rgba($success-color, 0.1);
+      color: $success-color;
+      border: 1px solid rgba($success-color, 0.3);
+    }
+
+    &.out_of_stock {
+      background: rgba($error-color, 0.1);
+      color: $error-color;
+      border: 1px solid rgba($error-color, 0.3);
+    }
+  }
+
+
+  th,
+  td {
+    padding: $spacing-md;
+    text-align: left;
+    border-bottom: 1px solid $border-color;
+  }
+
+  th {
+    background: lighten($bg-color, 2%);
+    font-weight: 600;
+    color: $text-color;
+    position: sticky;
+    top: 0;
+  }
+
+  tr {
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: $bg-color;
+    }
+  }
+
+  .actions {
+    gap: $spacing-sm;
+
+    button {
+      padding: $spacing-xs;
+      border-radius: $border-radius-sm;
+      font-size: $font-size-xs;
+    }
+
+    .btn-move {
+      width: 50%;
+      background: $primary-color;
+      color: $white;
+    }
+
+    .btn-delete {
+      width: 100%;
+      background: $error-color;
+      color: $white;
+    }
+
+    :disabled {
+      background: $text-light;
+      cursor: not-allowed;
+    }
+    
+  }
+
+
+}

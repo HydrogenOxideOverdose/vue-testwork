@@ -1,4 +1,4 @@
-import { Module, VuexModule, Mutation, Action, MutationAction } from 'vuex-module-decorators';
+import { Module, VuexModule, Mutation, MutationAction } from 'vuex-module-decorators';
 import { Product, ProductCategory, ProductStatus, ProductFormData, Notification } from '@/types/product';
 import { ProductsState } from '@/store/types';
 import { mockApi } from '@/services/mockApi';
@@ -23,6 +23,11 @@ export default class ProductsModule extends VuexModule implements ProductsState 
     this.notification = notification;
   }
 
+  @Mutation
+  SET_LOADING(loading: boolean): void {
+    this.isLoading = loading;
+  }
+
   @MutationAction
   async loadProducts() {
     console.log('MutationAction: loadProducts');
@@ -35,6 +40,13 @@ export default class ProductsModule extends VuexModule implements ProductsState 
   async addProduct(formData: ProductFormData) {
     console.log('MutationAction: addProduct получил:', formData);
     try {
+
+
+      if (formData.name == "error") {     //Это для теста ошибочных уведомлений
+        throw "Name can't be error";
+      }
+
+
       this.context.commit('SET_LOADING', true);
       await mockApi.createProduct(formData);
       const newProduct: Product = {
@@ -145,9 +157,10 @@ export default class ProductsModule extends VuexModule implements ProductsState 
 
 interface NotificationContext {
   context: {
-    commit: (mutation: string, payload?: any) => void;
+    commit: (mutation: 'SET_NOTIFICATION', payload: Notification | null) => void;
   };
 }
+
 
 const showNotificationHelper = (ctx: NotificationContext, message: string, type: 'success' | 'error'): void => {
   const notification: Notification = {

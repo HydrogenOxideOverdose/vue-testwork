@@ -59,17 +59,11 @@
     <button 
       type="submit" 
       :disabled="isLoading || hasErrors"
-      class="btn-submit"
+      class="big-btn"
     >
-      {{ isLoading ? 'Добавление...' : 'Добавить товар' }}
+      {{ isLoading ? 'Ожидание...' : 'Добавить товар' }}
     </button>
 
-    <div style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
-      <h4>Отладочная информация:</h4>
-      <p>hasErrors: {{ hasErrors }}</p>
-      <p>errors: {{ errors }}</p>
-      <p>fieldErrors: {{ fieldErrors }}</p>
-    </div>
   </form>
 </template>
 
@@ -201,14 +195,13 @@ export default class ProductForm extends Vue {
     console.log('validateAllFields finished - errors:', this.errors, 'fieldErrors:', this.fieldErrors);
   }
 
-  submitForm(): void {
+  async submitForm(): Promise<void> {
     console.log('submitForm started');
     this.validateAllFields();
 
     console.log('Before submit check - hasErrors:', this.hasErrors, 'errors:', this.errors);
 
     if (!this.hasErrors) {
-      this.isLoading = true
       
       console.log('Form is valid, submitting...');
 
@@ -218,12 +211,11 @@ export default class ProductForm extends Vue {
         price: Number(this.formData.price),
         quantity: Number(this.formData.quantity)
       };
-      console.log('Emitting data:', submitData);
-      this.$emit('submit', submitData);
+      console.log('Data:', submitData);
+      await this.$emit('submit', submitData);
 
       this.resetForm();
-      
-      this.isLoading = false
+
     } else {
       console.log('Form has errors, not submitting');
     }
@@ -242,67 +234,3 @@ export default class ProductForm extends Vue {
   }
 }
 </script>
-
-<style scoped>
-.product-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-.form-group input,
-.form-group select {
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  transition: border-color 0.3s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #2196F3;
-}
-
-.form-group input.error,
-.form-group select.error {
-  border-color: #f44336;
-}
-
-.error-message {
-  color: #f44336;
-  font-size: 12px;
-  margin-top: 5px;
-  min-height: 16px;
-}
-
-.btn-submit {
-  background: #2196F3;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
-}
-
-.btn-submit:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.btn-submit:not(:disabled):hover {
-  background: #1976D2;
-}
-</style>
